@@ -1,0 +1,18 @@
+﻿// keybinds!
+// valid mouse buttons are leftmouse, rightmouse, middlemouse, sidemouse1, sidemouse2
+// there's too many valid keyboard buttons to mention, so visit
+// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.input.keys.aspx
+// to see a list.
+//
+// Config is set up as follows:
+// action : key1, key2, key3
+//
+// so for example:
+// up: W, sidemouse1
+
+up:		Up,		W
+down:		Down,		S
+left:		Left,		A
+right:		Right,		D
+back:		escape
+accept:		enter
