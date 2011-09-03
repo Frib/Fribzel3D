@@ -1,0 +1,9 @@
+This aims to be a ready-to-use XNA project with lots of boilerplate stuff done.
+It currently features screen management (with an automatic menu creation screen), input management and some resource management.
+
+I plan to add mouse support for the menus and some more fancy menu features to make them look nicer.
+Next to that, I plan to add the first steps of 3D code. A world, entities made of models or polygons, basic collision, basic shader, etc.
+Audio is on my to-do list as well.
+
+I'm mostly making this for myself to use for Ludum Dare and to avoid having to recreate the same basic code slightly different every time I want to try a new game concept.
+This is my first github project. Feel free to look around and use or modify it, or comment on it. I've no idea if I am doing things right :D
