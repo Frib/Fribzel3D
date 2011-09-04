@@ -9,13 +9,16 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System.Globalization;
+using Fribzel3D.Screens;
+using Fribzel3D.Management;
+using Fribzel3D.ResourceFiles;
 
 namespace Fribzel3D
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Fribzel : Microsoft.Xna.Framework.Game
     {
         private static GraphicsDeviceManager graphics;
 
@@ -24,7 +27,7 @@ namespace Fribzel3D
         /// </summary>
         public static GraphicsDeviceManager Graphics
         {
-            get { return Game1.graphics; }
+            get { return Fribzel.graphics; }
         }
         private static SpriteBatch spriteBatch;
 
@@ -33,16 +36,16 @@ namespace Fribzel3D
         /// </summary>
         public static SpriteBatch SpriteBatch
         {
-            get { return Game1.spriteBatch; }
+            get { return Fribzel.spriteBatch; }
         }
-        private static Game1 game;
+        private static Fribzel game;
 
         /// <summary>
         /// this game
         /// </summary>
-        public static Game1 BaseGame
+        public static Fribzel BaseGame
         {
-            get { return Game1.game; }
+            get { return Fribzel.game; }
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace Fribzel3D
 
         Screen currentScreen;
 
-        public Game1()
+        public Fribzel()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -89,7 +92,7 @@ namespace Fribzel3D
         {
             base.Initialize();
             RM.ConfigureKeys();
-            ShowScreen(SM.MainMenu());
+            ShowScreen(ScreenManager.MainMenu());
         }
 
         /// <summary>
@@ -100,8 +103,8 @@ namespace Fribzel3D
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            RM.AddFont(Fonts.MenuFont, Content.Load<SpriteFont>("MenuFont"));
-            RM.AddFont(Fonts.DefaultFont, Content.Load<SpriteFont>("DefaultFont"));
+            RM.AddFont(Font.MenuFont, Content.Load<SpriteFont>("MenuFont"));
+            RM.AddFont(Font.DefaultFont, Content.Load<SpriteFont>("DefaultFont"));
         }
 
         /// <summary>
@@ -139,8 +142,8 @@ namespace Fribzel3D
             currentScreen.Draw(gameTime);
 
             // debug stuff! allocated memory and framerate
-            spriteBatch.DrawString(RM.Font(Fonts.DefaultFont), GC.GetTotalMemory(true).ToString(CultureInfo.InvariantCulture), new Vector2(0, 0), Color.White);
-            SpriteBatch.DrawString(RM.Font(Fonts.DefaultFont), gameTime.ElapsedGameTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture), new Vector2(0, 32), Color.White);
+            spriteBatch.DrawString(RM.Font(Font.DefaultFont), GC.GetTotalMemory(true).ToString(CultureInfo.InvariantCulture), new Vector2(0, 0), Color.White);
+            SpriteBatch.DrawString(RM.Font(Font.DefaultFont), gameTime.ElapsedGameTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture), new Vector2(0, 32), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -154,13 +157,18 @@ namespace Fribzel3D
         {
             if (screen != null)
             {
-                if (currentScreen != null)
-                {
-                    currentScreen.Hide();
-                }
-                currentScreen = screen;
-                currentScreen.Show();
+                SwitchScreen(screen);
             }
+        }
+
+        private void SwitchScreen(Screen screen)
+        {
+            if (currentScreen != null)
+            {
+                currentScreen.Hide();
+            }
+            currentScreen = screen;
+            currentScreen.Show();
         }
     }
 }

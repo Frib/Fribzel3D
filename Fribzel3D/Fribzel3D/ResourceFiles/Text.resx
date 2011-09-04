@@ -117,10 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DefaultFont" xml:space="preserve">
-    <value>DefaultFont</value>
+  <data name="ConfigMenuEscapeEnter" xml:space="preserve">
+    <value>You cannot (re)map enter or escape. Multibinds are possible</value>
   </data>
-  <data name="MenuFont" xml:space="preserve">
-    <value>MenuFont</value>
+  <data name="ConfigMenuNavigation" xml:space="preserve">
+    <value>Use Arrows to select, enter to bind. Esc cancels, backspace clears.</value>
+  </data>
+  <data name="MadeBy" xml:space="preserve">
+    <value>Made by Frib</value>
+  </data>
+  <data name="MenuNavigation" xml:space="preserve">
+    <value>Use {0} and {1} to navigate</value>
+  </data>
+  <data name="MenuSelection" xml:space="preserve">
+    <value>Press {0} to accept and {1} to go back</value>
   </data>
 </root>

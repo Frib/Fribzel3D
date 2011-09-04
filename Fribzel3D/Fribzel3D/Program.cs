@@ -10,7 +10,7 @@ namespace Fribzel3D
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (Fribzel game = new Fribzel())
             {
                 game.Run();
             }

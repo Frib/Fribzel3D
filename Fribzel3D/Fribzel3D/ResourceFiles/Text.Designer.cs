@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Fribzel3D {
+namespace Fribzel3D.ResourceFiles {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Fribzel3D {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Input {
+    internal class Text {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Input() {
+        internal Text() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Fribzel3D {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Fribzel3D.Input", typeof(Input).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Fribzel3D.ResourceFiles.Text", typeof(Text).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,47 @@ namespace Fribzel3D {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accept.
+        ///   Looks up a localized string similar to You cannot (re)map enter or escape. Multibinds are possible.
         /// </summary>
-        internal static string Accept {
+        internal static string ConfigMenuEscapeEnter {
             get {
-                return ResourceManager.GetString("Accept", resourceCulture);
+                return ResourceManager.GetString("ConfigMenuEscapeEnter", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Back.
+        ///   Looks up a localized string similar to Use Arrows to select, enter to bind. Esc cancels, backspace clears..
         /// </summary>
-        internal static string Back {
+        internal static string ConfigMenuNavigation {
             get {
-                return ResourceManager.GetString("Back", resourceCulture);
+                return ResourceManager.GetString("ConfigMenuNavigation", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Down.
+        ///   Looks up a localized string similar to Made by Frib.
         /// </summary>
-        internal static string Down {
+        internal static string MadeBy {
             get {
-                return ResourceManager.GetString("Down", resourceCulture);
+                return ResourceManager.GetString("MadeBy", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Left.
+        ///   Looks up a localized string similar to Use {0} and {1} to navigate.
         /// </summary>
-        internal static string Left {
+        internal static string MenuNavigation {
             get {
-                return ResourceManager.GetString("Left", resourceCulture);
+                return ResourceManager.GetString("MenuNavigation", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Right.
+        ///   Looks up a localized string similar to Press {0} to accept and {1} to go back.
         /// </summary>
-        internal static string Right {
+        internal static string MenuSelection {
             get {
-                return ResourceManager.GetString("Right", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Up.
-        /// </summary>
-        internal static string Up {
-            get {
-                return ResourceManager.GetString("Up", resourceCulture);
+                return ResourceManager.GetString("MenuSelection", resourceCulture);
             }
         }
     }
