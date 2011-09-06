@@ -78,8 +78,7 @@ namespace Fribzel3D
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            game = this;
-            IM.SnapToCenter = true;
+            game = this;            
         }
 
         /// <summary>

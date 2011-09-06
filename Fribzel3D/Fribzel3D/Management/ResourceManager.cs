@@ -44,7 +44,7 @@ namespace Fribzel3D.Management
         /// </summary>
         static RM()
         {
-            foreach (InputAction ia in GetValidInputStrings())
+            foreach (InputAction ia in GetValidInputActions())
             {
                 input.Add(ia, new List<Button>());
             }
@@ -54,7 +54,7 @@ namespace Fribzel3D.Management
         /// Get an array with all the inputs that need to be bound
         /// </summary>
         /// <returns></returns>
-        public static InputAction[] GetValidInputStrings()
+        public static InputAction[] GetValidInputActions()
         {
             List<InputAction> result = new List<InputAction>();
 
@@ -184,12 +184,17 @@ namespace Fribzel3D.Management
 
                 foreach (string val in values.Split(','))
                 {
-                    Button b = CreateButtonFromText(val);
-                    if (b != null)
-                    {
-                        AddKey((InputAction)Enum.Parse(typeof(InputAction), key, true), b);
-                    }
+                    AddButton(key, val);
                 }
+            }
+        }
+
+        private static void AddButton(string inputaction, string button)
+        {
+            Button b = CreateButtonFromText(button);
+            if (b != null && b.IsBound)
+            {
+                AddKey((InputAction)Enum.Parse(typeof(InputAction), inputaction, true), b);
             }
         }
 
@@ -204,7 +209,6 @@ namespace Fribzel3D.Management
                 case ("SIDE2MOUSE"): return new Button(MouseButton.Side2);
                 default: break;
             }
-
             try
             {
                 Keys k = (Keys)Enum.Parse(typeof(Keys), val, true);
@@ -263,18 +267,7 @@ namespace Fribzel3D.Management
             StringBuilder sb = new StringBuilder();
             if (File.Exists("config.txt"))
             {
-                string[] lines = File.ReadAllLines("config.txt");
-                foreach (string line in lines)
-                {
-                    if (line.StartsWith("//", StringComparison.OrdinalIgnoreCase))
-                    {
-                        sb.AppendLine(line);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                AppendCommentsFromConfigFile(sb);
             }
 
             foreach (InputAction ia in input.Keys)
@@ -297,6 +290,22 @@ namespace Fribzel3D.Management
             }
 
             File.WriteAllText("config.txt", sb.ToString());
+        }
+
+        private static void AppendCommentsFromConfigFile(StringBuilder sb)
+        {
+            string[] lines = File.ReadAllLines("config.txt");
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("//", StringComparison.OrdinalIgnoreCase))
+                {
+                    sb.AppendLine(line);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
     }
 }

@@ -36,5 +36,13 @@ namespace Fribzel3D.Screens
             get { return action; }
             set { action = value; }
         }
+
+        public bool Intersects(Vector2 position)
+        {
+            return (position.X >= Position.X &&
+                     position.X <= Position.X + Size.X &&
+                     position.Y >= Position.Y &&
+                     position.Y <= Position.Y + Size.Y);
+        }
     }
 }

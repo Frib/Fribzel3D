@@ -15,9 +15,9 @@ namespace Fribzel3D.Management
     {
         public static Screen MainMenu()
         {
-            MenuScreen ms = new MenuScreen();
+            MenuScreen ms = new MenuScreen(ControlMode.Keyboard);
             ms.AddMenuEntry("Play", new Action(() => { Fribzel.BaseGame.ShowScreen(ScreenManager.GameScreen()); }));
-            ms.AddMenuEntry("Options", new Action(() => { Fribzel.BaseGame.ShowScreen(ScreenManager.ControlScreen()); }));
+            ms.AddMenuEntry("Options", new Action(() => { Fribzel.BaseGame.ShowScreen(ScreenManager.ControlScreen(ms)); }));
             ms.AddMenuEntry("Quit", new Action(() => { Fribzel.BaseGame.Exit(); }));
 
             ms.AddHeader(string.Format(CultureInfo.CurrentCulture, Text.MenuNavigation, RM.GetButtons(InputAction.Up)[0].ToString(), RM.GetButtons(InputAction.Down)[0].ToString()));
@@ -27,14 +27,14 @@ namespace Fribzel3D.Management
             return ms;
         }
 
-        public static Screen ControlScreen()
+        public static Screen ControlScreen(Screen screenToGoBackTo)
         {
-            return new ControlScreen();
+            return new ControlScreen(screenToGoBackTo);
         }
 
         public static Screen GameScreen()
         {
-            return new MenuScreen();
+            return new MenuScreen(ControlMode.Keyboard);
         }
     }
 }

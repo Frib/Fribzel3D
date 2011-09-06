@@ -120,6 +120,7 @@
     <Compile Include="Screens\ControlScreen.cs" />
     <Compile Include="Screens\MenuOption.cs" />
     <Compile Include="Screens\MenuScreen.cs" />
+    <Compile Include="Screens\MouseMode.cs" />
     <Compile Include="Screens\Screen.cs" />
     <Compile Include="Management\ScreenManager.cs" />
     <Compile Include="ResourceFiles\Text.Designer.cs">

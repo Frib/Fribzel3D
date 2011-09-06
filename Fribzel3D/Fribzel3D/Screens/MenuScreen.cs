@@ -28,6 +28,13 @@ namespace Fribzel3D.Screens
         private int selectedOption;
         private Action backAction;
 
+        private ControlMode controlMode;
+
+        public MenuScreen(ControlMode controlMode)
+        {
+            this.controlMode = controlMode;
+        }
+
         /// <summary>
         /// Add a selectable menu options
         /// </summary>
@@ -79,22 +86,25 @@ namespace Fribzel3D.Screens
 
         public override void Show()
         {
+            if (controlMode == ControlMode.Mouse || controlMode == ControlMode.KeyboardAndMouse)
+            {
+                IM.SnapToCenter = false;
+                Fribzel.BaseGame.IsMouseVisible = true;
+            }
+            else
+            {
+                IM.SnapToCenter = true;
+                Fribzel.BaseGame.IsMouseVisible = false;
+            }
             CalculatePositions();
             base.Show();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (RM.IsPressed(InputAction.Up))
-            {
-                selectedOption = CycleIndex(selectedOption - 1, options.Count - 1);
-            }
-            if (RM.IsPressed(InputAction.Down))
-            {
-                selectedOption = CycleIndex(selectedOption + 1, options.Count - 1);
-            }
+            HandleInputNavigation();
 
-            if (RM.IsPressed(InputAction.Accept) && options.Count > selectedOption)
+            if (CheckKeyboardAccept() || CheckMouseAccept())
             {
                 options[selectedOption].Action();
             }
@@ -104,6 +114,80 @@ namespace Fribzel3D.Screens
             }
 
             base.Update(gameTime);
+        }
+
+        private void HandleInputNavigation()
+        {
+            if (controlMode == ControlMode.Keyboard || controlMode == ControlMode.KeyboardAndMouse)
+            {
+                HandleKeyboardNavigation();
+            }
+            if (controlMode == ControlMode.KeyboardAndMouse && IM.MouseDelta.Length() != 0)
+            {
+                CalculateMouseSelection();
+            }
+            if (controlMode == ControlMode.Mouse)
+            {
+                if (!CalculateMouseSelection())
+                {
+                    selectedOption = -1;
+                }
+            }
+        }
+
+        private void HandleKeyboardNavigation()
+        {
+            if (RM.IsPressed(InputAction.Up))
+            {
+                selectedOption = CycleIndex(selectedOption - 1, options.Count - 1);
+            }
+            if (RM.IsPressed(InputAction.Down))
+            {
+                selectedOption = CycleIndex(selectedOption + 1, options.Count - 1);
+            }
+        }
+
+        private bool CheckKeyboardAccept()
+        {
+            if (controlMode == ControlMode.Keyboard || controlMode == ControlMode.KeyboardAndMouse)
+            {
+                if (RM.IsPressed(InputAction.Accept))
+                {
+                    return IsSelectedEntryValid();
+                }
+            }
+            return false;
+        }
+
+        private bool CheckMouseAccept()
+        {
+            if (controlMode == ControlMode.KeyboardAndMouse || controlMode == ControlMode.Mouse)
+            {
+                if (IM.IsLeftMousePressed() && CalculateMouseSelection())
+                {
+                    return IsSelectedEntryValid();
+                }
+            }
+            return false;
+        }
+
+        private bool IsSelectedEntryValid()
+        {
+            return options.Count > selectedOption && selectedOption >= 0;
+        }
+
+        private bool CalculateMouseSelection()
+        {
+            Vector2 mousePos = IM.MousePos;
+            for (int i = 0; i < options.Count; i++)
+            {
+                if (options[i].Intersects(mousePos))
+                {
+                    selectedOption = i;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override void Draw(GameTime gameTime)

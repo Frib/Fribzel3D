@@ -16,10 +16,11 @@ namespace Fribzel3D.Screens
     /// </summary>
     public class ControlScreen : Screen
     {
-        private List<InputAction> labels = new List<InputAction>();
-        private List<string> op1 = new List<string>();
-        private List<string> op2 = new List<string>();
-        private List<string> op3 = new List<string>();
+        private List<InputAction> actions = new List<InputAction>();
+        private List<MenuOption> labels = new List<MenuOption>();
+        private List<MenuOption> op1 = new List<MenuOption>();
+        private List<MenuOption> op2 = new List<MenuOption>();
+        private List<MenuOption> op3 = new List<MenuOption>();
 
         private int x = 0;
         private int y = 0;
@@ -28,10 +29,16 @@ namespace Fribzel3D.Screens
 
         private Action backAction;
 
+        public ControlScreen(Screen previousScreen) : base()
+        {
+            backAction = new Action(() => { RM.SaveConfig(); Fribzel.BaseGame.ShowScreen(previousScreen); });
+        }
+
         public override void Show()
         {
             CreateControls();
-            backAction = new Action(() => { RM.SaveConfig(); Fribzel.BaseGame.ShowScreen(ScreenManager.MainMenu()); });
+            Fribzel.BaseGame.IsMouseVisible = true;
+            IM.SnapToCenter = false;
             base.Show();
         }
 
@@ -40,42 +47,74 @@ namespace Fribzel3D.Screens
         /// </summary>
         private void CreateControls()
         {
+            actions.Clear();
             labels.Clear();
             op1.Clear();
             op2.Clear();
             op3.Clear();
-            InputAction[] buttons = RM.GetValidInputStrings();
-            foreach (InputAction s in buttons)
+            InputAction[] buttons = RM.GetValidInputActions();
+            foreach (InputAction ia in buttons)
             {
-                labels.Add(s);
-                List<Button> buttonList = RM.GetButtons(s);
+                AppendInputActions(ia);
+            }
+            CalculatePositions();
+        }
 
-                if (buttonList.Count > 0)
-                {
-                    op1.Add(buttonList[0].ToString());
-                }
-                else
-                {
-                    op1.Add("<EMPTY>");
-                }
+        private void CalculatePositions()
+        {
+            int offsetY = 80;
+            int quarter = Fribzel.Width / 5;
+            var font = RM.Font(Font.DefaultFont);
+            Vector2 minSize = new Vector2(font.MeasureString("<EMPTY>").X, 0);
 
-                if (buttonList.Count > 1)
-                {
-                    op2.Add(buttonList[1].ToString());
-                }
-                else
-                {
-                    op2.Add("<EMPTY>");
-                }
+            for (int i = 0; i < actions.Count; i++)
+            {
+                labels[i].Position = new Vector2(quarter, offsetY);
+                op1[i].Position = new Vector2(quarter * 2, offsetY);
+                op2[i].Position = new Vector2(quarter * 3, offsetY);
+                op3[i].Position = new Vector2(quarter * 4, offsetY);
 
-                if (buttonList.Count > 2)
-                {
-                    op3.Add(buttonList[2].ToString());
-                }
-                else
-                {
-                    op3.Add("<EMPTY>");
-                }
+                labels[i].Size = Vector2.Max(font.MeasureString(labels[i].Name), minSize);
+                op1[i].Size = Vector2.Max(font.MeasureString(op1[i].Name), minSize);
+                op2[i].Size = Vector2.Max(font.MeasureString(op2[i].Name), minSize);
+                op3[i].Size = Vector2.Max(font.MeasureString(op3[i].Name), minSize);
+
+                offsetY += 24;
+            }
+        }
+
+        private void AppendInputActions(InputAction ia)
+        {
+            actions.Add(ia);
+            labels.Add(new MenuOption() { Name = ia.ToString() });
+
+            List<Button> buttonList = RM.GetButtons(ia);
+
+            if (buttonList.Count > 0)
+            {
+                op1.Add(new MenuOption() { Name = buttonList[0].ToString() });
+            }
+            else
+            {
+                op1.Add(new MenuOption() { Name = "<EMPTY>" });
+            }
+
+            if (buttonList.Count > 1)
+            {
+                op2.Add(new MenuOption() { Name = buttonList[1].ToString() });
+            }
+            else
+            {
+                op2.Add(new MenuOption() { Name = "<EMPTY>" });
+            }
+
+            if (buttonList.Count > 2)
+            {
+                op3.Add(new MenuOption() { Name = buttonList[2].ToString() });
+            }
+            else
+            {
+                op3.Add(new MenuOption() { Name = "<EMPTY>" });
             }
         }
 
@@ -93,6 +132,22 @@ namespace Fribzel3D.Screens
 
         private void UpdateNavigating()
         {
+            bool hoversOverButton = HandleMouseInput();
+            HandleKeyboardInput();
+
+            if (hoversOverButton && IM.IsLeftMousePressed())
+            {
+                IsSelecting = true;
+            }
+
+            if (IM.IsKeyPressed(Keys.Enter))
+            {
+                IsSelecting = true;
+            }
+        }
+
+        private void HandleKeyboardInput()
+        {
             if (IM.IsKeyPressed(Keys.Escape))
             {
                 backAction();
@@ -107,16 +162,49 @@ namespace Fribzel3D.Screens
             }
             if (IM.IsKeyPressed(Keys.Up))
             {
-                y = CycleIndex(y - 1, labels.Count - 1);
+                y = CycleIndex(y - 1, actions.Count - 1);
             }
             if (IM.IsKeyPressed(Keys.Down))
             {
-                y = CycleIndex(y + 1, labels.Count - 1);
+                y = CycleIndex(y + 1, actions.Count - 1);
             }
-            if (IM.IsKeyPressed(Keys.Enter))
+        }
+
+        private bool HandleMouseInput()
+        {
+            bool movedMouse = IM.MouseDelta.Length() > 0;
+            Vector2 mousePos = IM.MousePos;
+            for (int i = 0; i < actions.Count; i++)
             {
-                IsSelecting = true;
+                if (op1[i].Intersects(mousePos))
+                {
+                    if (movedMouse)
+                    {
+                        y = i;
+                        x = 0;
+                    }
+                    return true;
+                }
+                else if (op2[i].Intersects(mousePos))
+                {
+                    if (movedMouse)
+                    {
+                        y = i;
+                        x = 1;
+                    }
+                    return true;
+                }
+                else if (op3[i].Intersects(mousePos))
+                {
+                    if (movedMouse)
+                    {
+                        y = i;
+                        x = 2;
+                    }
+                    return true;
+                }
             }
+            return false;
         }
 
         private void UpdateRebinding()
@@ -139,11 +227,11 @@ namespace Fribzel3D.Screens
             {
                 if (k[0] == Keys.Back)
                 {
-                    RM.InsertKey(labels[y], new Button(Keys.None), x);
+                    RM.InsertKey(actions[y], new Button(Keys.None), x);
                 }
                 else
                 {
-                    RM.InsertKey(labels[y], new Button(k[0]), x);
+                    RM.InsertKey(actions[y], new Button(k[0]), x);
                 }
                 SelectedValidKey();
                 return true;
@@ -156,7 +244,7 @@ namespace Fribzel3D.Screens
             MouseButton mb = IM.CurrentMousePressed;
             if (mb != MouseButton.None)
             {
-                RM.InsertKey(labels[y], new Button(mb), x);
+                RM.InsertKey(actions[y], new Button(mb), x);
                 SelectedValidKey();
                 return true;
             }
@@ -171,34 +259,28 @@ namespace Fribzel3D.Screens
 
         public override void Draw(GameTime gameTime)
         {
-            int offsetY = 80;
-            int quarter = Fribzel.Width / 5;
-
             SpriteBatch sb = Fribzel.SpriteBatch;
             SpriteFont sf = RM.Font(Font.DefaultFont);
 
             sb.DrawString(sf, Text.ConfigMenuNavigation, new Vector2(32, 16), CM.MainMenuFont);
             sb.DrawString(sf, Text.ConfigMenuEscapeEnter, new Vector2(32, 40), CM.MainMenuSelected);
 
-            for (int i = 0; i < labels.Count; i++)
+            for (int i = 0; i < actions.Count; i++)
             {
-                Fribzel.SpriteBatch.DrawString(sf, labels[i].ToString(), new Vector2(quarter * 1, offsetY), CM.MainMenuExtra);
-
-                // Not selected: Default color
-                // Highlighted: Selected color
-                // Highlighted and editing: Extra color
-                sb.DrawString(sf, op1[i], new Vector2(quarter * 2, offsetY), GetHightlightColor(0, i));
-                sb.DrawString(sf, op2[i], new Vector2(quarter * 3, offsetY), GetHightlightColor(1, i));
-                sb.DrawString(sf, op3[i], new Vector2(quarter * 4, offsetY), GetHightlightColor(2, i));
-
-                offsetY += 24;
+                sb.DrawString(sf, labels[i].Name, labels[i].Position, CM.MainMenuExtra);
+                sb.DrawString(sf, op1[i].Name, op1[i].Position, GetHightlightColor(0, i));
+                sb.DrawString(sf, op2[i].Name, op2[i].Position, GetHightlightColor(1, i));
+                sb.DrawString(sf, op3[i].Name, op3[i].Position, GetHightlightColor(2, i));
             }
 
             base.Draw(gameTime);
         }
 
-        public Color GetHightlightColor(int col, int row)
+        private Color GetHightlightColor(int col, int row)
         {
+            // Not selected: Default color
+            // Highlighted: Selected color
+            // Highlighted and editing: Extra color
             return y == row && x == col ? IsSelecting ? CM.MainMenuExtra : CM.MainMenuSelected : CM.MainMenuFont;
         }
     }
