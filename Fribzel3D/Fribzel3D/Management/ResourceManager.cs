@@ -194,7 +194,11 @@ namespace Fribzel3D.Management
             Button b = CreateButtonFromText(button);
             if (b != null && b.IsBound)
             {
-                AddKey((InputAction)Enum.Parse(typeof(InputAction), inputaction, true), b);
+                InputAction ia;
+                if (Enum.TryParse<InputAction>(inputaction, true, out ia))
+                {
+                    AddKey(ia, b);
+                }
             }
         }
 
@@ -257,6 +261,15 @@ namespace Fribzel3D.Management
         internal static List<Button> GetButtons(InputAction ia)
         {
             return input[ia];
+        }
+
+        internal static string GetFirstMappedButton(InputAction ia)
+        {
+            if (input[ia].Count > 0)
+            {
+                return input[ia][0].ToString();
+            }
+            return "<EMPTY>";
         }
 
         /// <summary>

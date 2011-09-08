@@ -24,12 +24,15 @@ namespace Fribzel3D.Screens
 
         private int x = 0;
         private int y = 0;
+        private int firstShownAction = 0;
+        private int actionsShown = 13;
 
         private bool IsSelecting;
 
         private Action backAction;
 
-        public ControlScreen(Screen previousScreen) : base()
+        public ControlScreen(Screen previousScreen)
+            : base()
         {
             backAction = new Action(() => { RM.SaveConfig(); Fribzel.BaseGame.ShowScreen(previousScreen); });
         }
@@ -60,61 +63,90 @@ namespace Fribzel3D.Screens
             CalculatePositions();
         }
 
+        private void SetFirstShownAction()
+        {
+            if (y < firstShownAction)
+            {
+                firstShownAction = y;
+            }
+            else if (y > firstShownAction + (actionsShown - 1))
+            {
+                firstShownAction = y - (actionsShown - 1);
+            }
+        }
+
+        private void PerformActionOnRowOfMenuOptions(int index, Action<MenuOption> action)
+        {
+            action(labels[index]);
+            action(op1[index]);
+            action(op2[index]);
+            action(op3[index]);
+        }
+
         private void CalculatePositions()
         {
-            int offsetY = 80;
+            int offsetY = 100;
             int quarter = Fribzel.Width / 5;
             var font = RM.Font(Font.DefaultFont);
             Vector2 minSize = new Vector2(font.MeasureString("<EMPTY>").X, 0);
 
+            SetFirstShownAction();
+
             for (int i = 0; i < actions.Count; i++)
             {
-                labels[i].Position = new Vector2(quarter, offsetY);
-                op1[i].Position = new Vector2(quarter * 2, offsetY);
-                op2[i].Position = new Vector2(quarter * 3, offsetY);
-                op3[i].Position = new Vector2(quarter * 4, offsetY);
+                if (i >= firstShownAction && i < firstShownAction + (actionsShown))
+                {
+                    labels[i].Position = new Vector2(quarter, offsetY);
+                    op1[i].Position = new Vector2(quarter * 2, offsetY);
+                    op2[i].Position = new Vector2(quarter * 3, offsetY);
+                    op3[i].Position = new Vector2(quarter * 4, offsetY);
 
-                labels[i].Size = Vector2.Max(font.MeasureString(labels[i].Name), minSize);
-                op1[i].Size = Vector2.Max(font.MeasureString(op1[i].Name), minSize);
-                op2[i].Size = Vector2.Max(font.MeasureString(op2[i].Name), minSize);
-                op3[i].Size = Vector2.Max(font.MeasureString(op3[i].Name), minSize);
+                    PerformActionOnRowOfMenuOptions(i, new Action<MenuOption>((mo) => { mo.Visible = true; }));
 
-                offsetY += 24;
+                    offsetY += 24;
+                }
+                else
+                {
+                    PerformActionOnRowOfMenuOptions(i, new Action<MenuOption>((mo) => { mo.Visible = false; }));
+                }
+                PerformActionOnRowOfMenuOptions(i, new Action<MenuOption>((mo) => { mo.Size = Vector2.Max(font.MeasureString(mo.Name), minSize); }));
             }
         }
 
         private void AppendInputActions(InputAction ia)
         {
+            SpriteFont sf = RM.Font(Font.DefaultFont);
+
             actions.Add(ia);
-            labels.Add(new MenuOption() { Name = ia.ToString() });
+            labels.Add(new MenuOption(ia.ToString(), sf));
 
             List<Button> buttonList = RM.GetButtons(ia);
 
             if (buttonList.Count > 0)
             {
-                op1.Add(new MenuOption() { Name = buttonList[0].ToString() });
+                op1.Add(new MenuOption(buttonList[0].ToString(), sf));
             }
             else
             {
-                op1.Add(new MenuOption() { Name = "<EMPTY>" });
+                op1.Add(new MenuOption("<EMPTY>", sf));
             }
 
             if (buttonList.Count > 1)
             {
-                op2.Add(new MenuOption() { Name = buttonList[1].ToString() });
+                op2.Add(new MenuOption(buttonList[1].ToString(), sf ));
             }
             else
             {
-                op2.Add(new MenuOption() { Name = "<EMPTY>" });
+                op2.Add(new MenuOption("<EMPTY>", sf));
             }
 
             if (buttonList.Count > 2)
             {
-                op3.Add(new MenuOption() { Name = buttonList[2].ToString() });
+                op3.Add(new MenuOption(buttonList[2].ToString(), sf));
             }
             else
             {
-                op3.Add(new MenuOption() { Name = "<EMPTY>" });
+                op3.Add(new MenuOption("<EMPTY>", sf));
             }
         }
 
@@ -163,16 +195,19 @@ namespace Fribzel3D.Screens
             if (IM.IsKeyPressed(Keys.Up))
             {
                 y = CycleIndex(y - 1, actions.Count - 1);
+                CalculatePositions();
             }
             if (IM.IsKeyPressed(Keys.Down))
             {
                 y = CycleIndex(y + 1, actions.Count - 1);
+                CalculatePositions();
             }
         }
 
         private bool HandleMouseInput()
         {
-            bool movedMouse = IM.MouseDelta.Length() > 0;
+            bool scrolled = HandleScroll();
+            bool movedMouse = IM.MouseDelta.Length() > 0 || scrolled;
             Vector2 mousePos = IM.MousePos;
             for (int i = 0; i < actions.Count; i++)
             {
@@ -201,6 +236,30 @@ namespace Fribzel3D.Screens
                         y = i;
                         x = 2;
                     }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool HandleScroll()
+        {
+            int sd = IM.ScrollDelta;
+            if (sd > 0)
+            {
+                if (firstShownAction > 0)
+                {
+                    firstShownAction -= 1;
+                    CalculatePositions();
+                    return true;
+                }
+            }
+            else if (sd < 0)
+            {
+                if (firstShownAction < actions.Count - actionsShown)
+                {
+                    firstShownAction += 1;
+                    CalculatePositions();
                     return true;
                 }
             }
@@ -267,10 +326,19 @@ namespace Fribzel3D.Screens
 
             for (int i = 0; i < actions.Count; i++)
             {
-                sb.DrawString(sf, labels[i].Name, labels[i].Position, CM.MainMenuExtra);
-                sb.DrawString(sf, op1[i].Name, op1[i].Position, GetHightlightColor(0, i));
-                sb.DrawString(sf, op2[i].Name, op2[i].Position, GetHightlightColor(1, i));
-                sb.DrawString(sf, op3[i].Name, op3[i].Position, GetHightlightColor(2, i));
+                labels[i].Draw(CM.MainMenuExtra);
+                op1[i].Draw(GetHightlightColor(0, i));
+                op2[i].Draw(GetHightlightColor(1, i));
+                op3[i].Draw(GetHightlightColor(2, i));
+            }
+
+            if (firstShownAction > 0)
+            {
+                sb.DrawString(sf, "^^^", new Vector2(Fribzel.Width / 2, 80), CM.MainMenuFont);
+            }
+            if (firstShownAction + actionsShown < actions.Count)
+            {
+                sb.DrawString(sf, "vvv", new Vector2(Fribzel.Width / 2, 80 + actionsShown * op1[firstShownAction].Size.Y), CM.MainMenuFont);
             }
 
             base.Draw(gameTime);

@@ -42,10 +42,8 @@ namespace Fribzel3D.Screens
         /// <param name="action">The action that should be performed when pressed</param>
         public void AddMenuEntry(string name, Action action)
         {
-            MenuOption mo = new MenuOption();
+            MenuOption mo = new MenuOption(name, RM.Font(Font.MenuFont));
             mo.Action = action;
-            mo.Name = name;
-            mo.Size = RM.Font(Font.MenuFont).MeasureString(name);
             options.Add(mo);
             fontHeight = (int)mo.Size.Y + 8;
             optionsHeight += fontHeight;
@@ -57,9 +55,7 @@ namespace Fribzel3D.Screens
         /// <param name="text">The text</param>
         public void AddHeader(string text)
         {
-            MenuOption mo = new MenuOption();
-            mo.Name = text;
-            mo.Size = RM.Font(Font.MenuFont).MeasureString(text);
+            MenuOption mo = new MenuOption(text, RM.Font(Font.MenuFont));
             header.Add(mo);
         }
 
@@ -69,9 +65,7 @@ namespace Fribzel3D.Screens
         /// <param name="text">the text</param>
         public void AddFooter(string text)
         {
-            MenuOption mo = new MenuOption();
-            mo.Name = text;
-            mo.Size = RM.Font(Font.MenuFont).MeasureString(text);
+            MenuOption mo = new MenuOption(text, RM.Font(Font.MenuFont));
             footer.Add(mo);
         }
 

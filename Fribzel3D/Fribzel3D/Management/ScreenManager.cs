@@ -15,13 +15,13 @@ namespace Fribzel3D.Management
     {
         public static Screen MainMenu()
         {
-            MenuScreen ms = new MenuScreen(ControlMode.Keyboard);
+            MenuScreen ms = new MenuScreen(ControlMode.KeyboardAndMouse);
             ms.AddMenuEntry("Play", new Action(() => { Fribzel.BaseGame.ShowScreen(ScreenManager.GameScreen()); }));
             ms.AddMenuEntry("Options", new Action(() => { Fribzel.BaseGame.ShowScreen(ScreenManager.ControlScreen(ms)); }));
             ms.AddMenuEntry("Quit", new Action(() => { Fribzel.BaseGame.Exit(); }));
 
-            ms.AddHeader(string.Format(CultureInfo.CurrentCulture, Text.MenuNavigation, RM.GetButtons(InputAction.Up)[0].ToString(), RM.GetButtons(InputAction.Down)[0].ToString()));
-            ms.AddHeader(string.Format(CultureInfo.CurrentCulture, Text.MenuSelection, RM.GetButtons(InputAction.Accept)[0].ToString(), RM.GetButtons(InputAction.Back)[0].ToString()));
+            ms.AddHeader(string.Format(CultureInfo.CurrentCulture, Text.MenuNavigation, RM.GetFirstMappedButton(InputAction.Up), RM.GetFirstMappedButton(InputAction.Down)));
+            ms.AddHeader(string.Format(CultureInfo.CurrentCulture, Text.MenuSelection, RM.GetFirstMappedButton(InputAction.Accept), RM.GetFirstMappedButton(InputAction.Back)));
 
             ms.AddFooter(Text.MadeBy);
             return ms;
